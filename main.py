@@ -59,7 +59,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await client.send_message(GMAIL_FARMER_USERNAME, text)
         return
 
-    # App Password format match
     if re.fullmatch(r"([a-z]{4}\s){3}[a-z]{4}", text.lower()):
         await context.bot.send_message(chat_id=user_id, text="ðŸ” App Password sent. Please wait...")
         user_map[user_id] = {"app_pass": text}
@@ -87,12 +86,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @client.on(events.NewMessage(from_users=GMAIL_FARMER_USERNAME))
 async def forward_reply(event):
     text = event.text.strip()
-
-    # Clean text
-    for word in ["Gmail Farmer", "$","to 0.12"]:
+    for word in ["Gmail Farmer", "$", "to 0.12"]:
         text = text.replace(word, "").strip()
 
-    # Parse buttons if any
     buttons = []
     if event.buttons:
         for row in event.buttons:
@@ -104,7 +100,6 @@ async def forward_reply(event):
                 buttons.append(row_buttons)
     reply_markup = InlineKeyboardMarkup(buttons) if buttons else None
 
-    # Forward only to the first user in queue
     if pending_users:
         user_id = pending_users.pop(0)
         await app.bot.send_message(chat_id=user_id, text=text, parse_mode="Markdown", reply_markup=reply_markup)
@@ -113,7 +108,6 @@ async def forward_reply(event):
 
 async def main():
     print("âœ… Collector Bot is starting...")
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
@@ -126,8 +120,6 @@ async def main():
 
     await client.start()
     await asyncio.gather(client.run_until_disconnected(), asyncio.Event().wait())
-
-# === RUN BOT ===
 
 if __name__ == "__main__":
     asyncio.run(main())
